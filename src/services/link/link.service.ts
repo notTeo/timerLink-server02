@@ -47,6 +47,7 @@ export async function deleteLinkById(userId: string, linkId: string) {
   if (!deletedLink) {
     throw new Error("Link not found");
   }
+  await User.updateOne({ _id: linkId }, { $pull: { links: linkId } });
   await user.save();
 }
 
@@ -55,7 +56,7 @@ export async function createNewTarget(
   linkId: string,
   url: string,
   expireDate: Date | null,
-  startDate: Date | null,
+  startDate: Date | null
 ) {
   const user = await User.findById(userId);
   if (!user) {
@@ -69,8 +70,8 @@ export async function createNewTarget(
 
   const newTarget = new Target({
     url: url,
-    expireDate : expireDate ? expireDate : null,
-    startDate : startDate ? startDate : null
+    expireDate: expireDate ? expireDate : null,
+    startDate: startDate ? startDate : null,
   });
 
   const savedTarget = await newTarget.save();
@@ -98,11 +99,17 @@ export async function deleteTargetById(
   linkId: string,
   targetId: string
 ) {
+  const link = await LinkGroup.findById(linkId);
+  if (!link) {
+    throw new Error("Link not found");
+  }
   const target = await getTargetById(userId, linkId, targetId);
   if (!target) {
     throw new Error("Target not found");
   }
   await Target.findByIdAndDelete(targetId);
+  await LinkGroup.updateOne({ _id: linkId }, { $pull: { targets: targetId } });
+  
 }
 
 export async function updateTargetById(

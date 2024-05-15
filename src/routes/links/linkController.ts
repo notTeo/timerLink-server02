@@ -12,8 +12,8 @@ export async function getLinks(
 ) {
   try {
     const userId = req.user._id;
-    const newLink = await linkService.getLinksByUserId(userId);
-    sendSuccessResponse(res, newLink);
+    const links = await linkService.getLinksByUserId(userId);
+    sendSuccessResponse(res, links);
   } catch (e) {
     next(e);
   }
@@ -109,12 +109,12 @@ export async function getTargetById(
 }
 
 export async function deleteTargetById(
-  req: Request,
+  req: UserRequest,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const linkId = req.params.linkId;
     const targetId = req.params.targetId;
     await linkService.deleteTargetById(userId, linkId, targetId);
