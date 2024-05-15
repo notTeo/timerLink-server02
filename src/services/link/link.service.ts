@@ -43,12 +43,21 @@ export async function getLinkById(userId: string, linkId: string) {
 
 export async function deleteLinkById(userId: string, linkId: string) {
   const user = await User.findById(userId);
-  const deletedLink = await LinkGroup.findByIdAndDelete(linkId);
-  if (!deletedLink) {
-    throw new Error("Link not found");
-  }
-  await User.updateOne({ _id: linkId }, { $pull: { links: linkId } });
-  await user.save();
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const link = await LinkGroup.findById(linkId);
+    if (!link) {
+      throw new Error("Link not found");
+    }
+    await Target.deleteMany({ _id: { $in: link.targets } });
+
+    await LinkGroup.findByIdAndDelete(linkId);
+
+    await User.updateOne({ _id: userId }, { $pull: { links: linkId } });
+
+    // Save the user
+    await user.save();
 }
 
 export async function createNewTarget(

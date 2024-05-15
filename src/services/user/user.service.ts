@@ -71,6 +71,7 @@ export async function deleteUserById(userId: string, res: Response) {
     if (!deletedUser) {
       return sendErrorResponse(res, "Error user not found", 404);
     }
+    
     return deletedUser;
   } catch (e) {
     console.log("Error deleting user", e);
