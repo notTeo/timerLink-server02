@@ -125,12 +125,12 @@ export async function deleteTargetById(
 }
 
 export async function updateTargetById(
-  req: Request,
+  req: UserRequest,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const linkId = req.params.linkId;
     const targetId = req.params.targetId;
     const targetBody = req.body;
@@ -139,7 +139,6 @@ export async function updateTargetById(
       linkId,
       targetId,
       targetBody,
-      res,
     );
     sendSuccessResponse(res, updatedTarget);
   } catch (e) {

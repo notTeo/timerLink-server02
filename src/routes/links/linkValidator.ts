@@ -24,3 +24,16 @@ export const targetBody = [
   body("startDate").optional().isString().withMessage("Date must be a string"),
   body("expireDate").optional().isString().withMessage("Date must be a string"),
 ];
+
+export const editTargetBody = [
+  body("url")
+    .optional()
+    .isString()
+    .withMessage("Url must be a string"),
+
+  body("startDate").optional().isString().withMessage("Date must be a string"),
+  body('expireDate')
+    .optional()
+    .isString()
+    .withMessage('Expiry date must be a string')
+];

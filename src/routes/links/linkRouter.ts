@@ -44,7 +44,10 @@ router.delete(
   linkConroller.deleteTargetById
 );
 router.put(
-  "/:userId/:linkId/:targetId/edit",
+  "/:linkId/:targetId/edit",
+  authMiddleware.token,
+  authMiddleware.validateToken,
+  linkValidator.editTargetBody,
   linkConroller.updateTargetById
 );
 

@@ -1,8 +1,6 @@
 import { User } from "../../models/index";
 import { LinkGroup } from "../../models/linkGroupSchema";
 import { Target } from "../../models/targetSchema";
-import { Response } from "express";
-import { sendErrorResponse } from "../../utils/responses";
 
 export async function createNewLink(userId: string, name: any) {
   const user = await User.findById(userId);
@@ -43,21 +41,21 @@ export async function getLinkById(userId: string, linkId: string) {
 
 export async function deleteLinkById(userId: string, linkId: string) {
   const user = await User.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    const link = await LinkGroup.findById(linkId);
-    if (!link) {
-      throw new Error("Link not found");
-    }
-    await Target.deleteMany({ _id: { $in: link.targets } });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const link = await LinkGroup.findById(linkId);
+  if (!link) {
+    throw new Error("Link not found");
+  }
+  await Target.deleteMany({ _id: { $in: link.targets } });
 
-    await LinkGroup.findByIdAndDelete(linkId);
+  await LinkGroup.findByIdAndDelete(linkId);
 
-    await User.updateOne({ _id: userId }, { $pull: { links: linkId } });
+  await User.updateOne({ _id: userId }, { $pull: { links: linkId } });
 
-    // Save the user
-    await user.save();
+  // Save the user
+  await user.save();
 }
 
 export async function createNewTarget(
@@ -76,7 +74,15 @@ export async function createNewTarget(
   if (!link) {
     throw new Error("Link was not found");
   }
+  if (startDate && expireDate) {
+    const startDateObj = new Date(startDate);
+    const expireDateObj = new Date(expireDate);
 
+    if (startDateObj >= expireDateObj) {
+      throw new Error("Expiry date must be after start date")
+    }
+  }
+  
   const newTarget = new Target({
     url: url,
     expireDate: expireDate ? expireDate : null,
@@ -118,28 +124,29 @@ export async function deleteTargetById(
   }
   await Target.findByIdAndDelete(targetId);
   await LinkGroup.updateOne({ _id: linkId }, { $pull: { targets: targetId } });
-  
 }
 
 export async function updateTargetById(
   userId: string,
   linkId: string,
   targetId: string,
-  targetBody: any,
-  res: Response
+  targetBody: any
 ) {
-  try {
-    const target = getTargetById(userId, linkId, targetId);
-    if (!target) {
-      return sendErrorResponse(res, "Target not found", 404);
-    }
-    const updatedTarget = await Target.findByIdAndUpdate(targetId, targetBody, {
-      new: true,
-    });
-    await updatedTarget.save();
-    return updatedTarget;
-  } catch (e) {
-    console.log("Error getting target:", e);
-    sendErrorResponse(res, "Error getting target", 500);
+  const target = await Target.findById(targetId);
+  if (!target) {
+    throw new Error("Target not found");
   }
+  if (targetBody.startDate && targetBody.expireDate) {
+    const startDateObj = new Date(targetBody.startDate);
+    const expireDateObj = new Date(targetBody.expireDate);
+
+    if (startDateObj >= expireDateObj) {
+      throw new Error("Expiry date must be after start date")
+    }
+  }
+  const updatedTarget = await Target.findByIdAndUpdate(targetId, targetBody, {
+    new: true,
+  });
+  await updatedTarget.save();
+  return updatedTarget;
 }
