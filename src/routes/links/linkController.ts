@@ -130,13 +130,9 @@ export async function updateTargetById(
   next: NextFunction,
 ) {
   try {
-    const userId = req.user._id;
-    const linkId = req.params.linkId;
     const targetId = req.params.targetId;
     const targetBody = req.body;
     const updatedTarget = await linkService.updateTargetById(
-      userId,
-      linkId,
       targetId,
       targetBody,
     );

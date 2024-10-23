@@ -127,8 +127,6 @@ export async function deleteTargetById(
 }
 
 export async function updateTargetById(
-  userId: string,
-  linkId: string,
   targetId: string,
   targetBody: any
 ) {
