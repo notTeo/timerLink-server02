@@ -15,7 +15,7 @@ export async function login(
   try {
     const { username, password } = req.body;
     const token = await authService.login(username, password);
-    sendSuccessResponse(res, { token });
+    sendSuccessResponse(res, { token, username });
   } catch (e) {
     next(e);
   }
