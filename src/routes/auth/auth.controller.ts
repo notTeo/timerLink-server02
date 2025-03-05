@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "../../services/auth/auth.service";
-import { sendSuccessResponse } from "../../utils/responses";
+import { sendErrorResponse, sendSuccessResponse } from "../../utils/responses";
 import { IUserPayload } from "../../models";
 
 interface UserRequest extends Request {

@@ -34,8 +34,8 @@ const email = body("email")
 .withMessage("Email must be a string")
 .isLength({ min: 8, max: 25 })
 .withMessage(
-  "Password must be minimum 8 characters long and maximum 25 characters long"
+  "Email must be minimum 8 characters long and maximum 25 characters long"
 )
 
 export const login = [username, password];
-export const register = [username, password, confirmPassword, email];
+export const register = [username, email, password, confirmPassword];

@@ -13,12 +13,10 @@ export async function login(
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) throw new Error("Invalid credentialss");
 
-  const currentTimestamp: number = Math.floor(Date.now() / 1000);
-  const expirationTimestamp: number = currentTimestamp + 3600;
-
   return jwt.sign(
-    { _id: user._id, exp: expirationTimestamp },
-    process.env.JWT_SECRET
+    { _id: user._id }, 
+    process.env.JWT_SECRET as string, 
+    { expiresIn: '1d' } 
   );
 }
 
@@ -32,13 +30,25 @@ export async function register(
   email: string,
   confirmPassword: string
 ): Promise<UserDocument> {
-  const existingUser = await User.findOne({ username: username });
-  if (existingUser) {
-    throw new Error("User already exists");
+  const registerErrors = []
+  const existingUsername = await User.findOne({ username: username });
+
+  if (existingUsername) {
+    registerErrors.push("Username already exists");
+  }
+  const existingEmail = await User.findOne({ email: email });
+  if (existingEmail) {
+    registerErrors.push("A user with this email address is already registered. Please use a different email.");
   }
   if (!confirmPassword || password !== confirmPassword) {
-    throw new Error("Passwords do not match");
+    registerErrors.push("Passwords do not match");
   }
+  if (registerErrors.length > 0) {
+    const error = new Error(registerErrors.join("\n"));
+    (error as any).status = 400;
+    throw error;
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({
     username: username,

@@ -17,7 +17,7 @@ export const createUserValidation = [
     .withMessage("Email must be a string")
     .isLength({ min: 8, max: 25 })
     .withMessage(
-      "Password must be minimum 8 characters long and maximum 25 characters long"
+      "Email must be minimum 8 characters long and maximum 25 characters long"
     ),
   body("password")
     .exists()
